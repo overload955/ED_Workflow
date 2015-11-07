@@ -7,6 +7,10 @@ breed [doctors doctor]
 ;; Patients properties
 patients-own [arrive-tick leave-tick]
 
+globals [
+  rest_of_patients 
+]
+
 to setup
   clear-all
   reset-ticks
@@ -18,15 +22,7 @@ to setup
     set pcolor white
   ]
   
-  create-patients patients-per-10-minutes [
-    set size 2
-    let seed (random-weighted [red blue green yellow gray] 
-      (list red-percentage blue-percentage green-percentage yellow-percentage gray-percentage))
-    set color seed
-    setxy -31 0
-    ;set heading 90
-    set arrive-tick ticks
-  ]
+  set rest_of_patients 0
   
   create-doctors number-of-doctors [
     setxy 31 0
@@ -38,8 +34,12 @@ end
 
 to go
   tick
-  ;ask patients with [color = red] [forward 1]
-  create-patients patients-per-10-minutes [
+  
+  ; keep the count of patients if not divided exactly by 10
+  set rest_of_patients ((patients-per-10-minutes + rest_of_patients) mod 10)
+   show rest_of_patients
+    
+  create-patients (patients-per-10-minutes + rest_of_patients) / 10 [
     set size 2
     let seed (random-weighted [red blue green yellow gray] 
       (list red-percentage blue-percentage green-percentage yellow-percentage gray-percentage))
@@ -94,7 +94,7 @@ GRAPHICS-WINDOW
 0
 0
 1
-ticks
+minutes
 30.0
 
 BUTTON
@@ -147,21 +147,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-11
-113
-195
-146
-patients-per-10-minutes
-patients-per-10-minutes
-0
-50
-50
-1
-1
-NIL
-HORIZONTAL
 
 SLIDER
 11
@@ -225,9 +210,9 @@ HORIZONTAL
 
 SLIDER
 11
-278
+113
 183
-311
+146
 gray-percentage
 gray-percentage
 0
@@ -293,27 +278,50 @@ count patients with [color = gray]
 1
 11
 
-INPUTBOX
+SLIDER
 11
-317
-114
-377
-number-of-doctors
-10
-1
+295
+195
+328
+patients-per-10-minutes
+patients-per-10-minutes
 0
-Number
-
-INPUTBOX
-11
-384
-111
-444
-number-of-beds
+50
 50
 1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+328
+183
+361
+number-of-doctors
+number-of-doctors
 0
-Number
+100
+50
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+361
+183
+394
+number-of-beds
+number-of-beds
+0
+100
+50
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
