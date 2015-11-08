@@ -8,7 +8,7 @@ breed [doctors doctor]
 patients-own [arrive-tick leave-tick]
 
 globals [
-  rest_of_patients 
+  rest_of_patients ;; used if patients-per-10-minutes is not exactly divided by 10. 
 ]
 
 to setup
@@ -22,8 +22,6 @@ to setup
     set pcolor white
   ]
   
-  set rest_of_patients 0
-  
   create-doctors number-of-doctors [
     setxy 31 0
     set color black
@@ -32,6 +30,7 @@ to setup
   
 end
 
+;; go 1 step
 to go
   tick
   
@@ -50,6 +49,17 @@ to go
   ]
   create
 end
+
+;; go 60 steps (1 hour of evolution)
+to go-one-hour
+  repeat 60 [go]
+end
+
+;; go 24 * 60 steps (24 hours of evolution)
+to go-24-hours
+  repeat 24 [go-one-hour]
+end
+
 
 to create
   ask patients [
@@ -150,9 +160,9 @@ NIL
 
 SLIDER
 11
-146
+191
 183
-179
+224
 red-percentage
 red-percentage
 0
@@ -165,9 +175,9 @@ HORIZONTAL
 
 SLIDER
 11
-212
+257
 183
-245
+290
 green-percentage
 green-percentage
 0
@@ -180,9 +190,9 @@ HORIZONTAL
 
 SLIDER
 11
-179
+224
 183
-212
+257
 blue-percentage
 blue-percentage
 0
@@ -195,9 +205,9 @@ HORIZONTAL
 
 SLIDER
 11
-245
+290
 183
-278
+323
 yellow-percentage
 yellow-percentage
 0
@@ -210,9 +220,9 @@ HORIZONTAL
 
 SLIDER
 11
-113
+323
 183
-146
+356
 gray-percentage
 gray-percentage
 0
@@ -268,10 +278,10 @@ count patients with [color = yellow]
 11
 
 MONITOR
-200
-109
-288
-154
+85
+110
+173
+155
 Gray Patients
 count patients with [color = gray]
 17
@@ -279,25 +289,25 @@ count patients with [color = gray]
 11
 
 SLIDER
-11
-295
-195
-328
+8
+376
+192
+409
 patients-per-10-minutes
 patients-per-10-minutes
 0
 50
-50
+11
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-11
-328
-183
-361
+8
+409
+180
+442
 number-of-doctors
 number-of-doctors
 0
@@ -309,10 +319,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-361
-183
-394
+8
+442
+180
+475
 number-of-beds
 number-of-beds
 0
@@ -322,6 +332,40 @@ number-of-beds
 1
 NIL
 HORIZONTAL
+
+BUTTON
+11
+108
+75
+141
+Go 1h
+go-one-hour
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+11
+141
+82
+174
+Go 24h
+go-24-hours
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
