@@ -8,12 +8,15 @@ breed [doctors doctor]
 patients-own [arrive-tick leave-tick]
 
 globals [
+  ;;steps            ;; increment the tick counter only if step is exactly divided by tick-increment
+  ;;tick-increment   ;; if steps is divided by this value, increment the tick counter
   rest_of_patients ;; used if patients-per-10-minutes is not exactly divided by 10. 
 ]
 
 to setup
   clear-all
   reset-ticks
+  ;;set tick-increment 10
   
   set-default-shape patients "person"
   set-default-shape doctors "person doctor"
@@ -32,8 +35,6 @@ end
 
 ;; go 1 step
 to go
-  tick
-  
   ; keep the count of patients if not divided exactly by 10
   set rest_of_patients ((patients-per-10-minutes + rest_of_patients) mod 10)
   ;show rest_of_patients
@@ -47,7 +48,8 @@ to go
     ;set heading 90
     set arrive-tick ticks
   ]
-  create
+  evolve
+  tick
 end
 
 ;; go 60 steps (1 hour of evolution)
@@ -61,10 +63,34 @@ to go-24-hours
 end
 
 
-to create
+to evolve
   ask patients [
-    forward 1 
+    forward 1
+    if (color = red) [
+      ;; assume that after 100 ticks from arriving, red patients are externed
+      if (ticks - arrive-tick > 60 * 24 * 10) [ ;; 10 days
+        show who ;;" arrived at " arrive-tick " and died at " ticks
+        die
+      ]
+    ]
+    if (color = blue) [
+      ;; assume that after 90 ticks from arriving, blue patients are externed
+      if (ticks - arrive-tick > 60 * 24 * 8) [die]
+    ]
+    if (color = green) [
+      ;; assume that after 70 ticks from arriving, green patients are externed
+      if (ticks - arrive-tick > 60 * 24 * 6) [die]
+    ]
+    if (color = yellow) [
+      ;; assume that after 50 ticks from arriving, yellow patients are externed
+      if (ticks - arrive-tick > 60 * 24 * 3) [die]
+    ]
+    if (color = gray) [
+      ;; assume that after 30 ticks from arriving, gray patients are externed
+      if (ticks - arrive-tick > 60 * 24 * 1) [die]
+    ]
   ]
+  
 end
 
 ;; returns a value from values list
@@ -104,7 +130,7 @@ GRAPHICS-WINDOW
 0
 0
 1
-minutes
+ticks
 30.0
 
 BUTTON
@@ -256,9 +282,9 @@ count patients with [color = blue]
 11
 
 MONITOR
-176
+177
 10
-271
+272
 55
 Green Patients
 count patients with [color = green]
@@ -297,7 +323,7 @@ patients-per-10-minutes
 patients-per-10-minutes
 0
 50
-11
+10
 1
 1
 NIL
@@ -366,6 +392,39 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+177
+110
+251
+155
+All Patients
+count patients
+17
+1
+11
+
+PLOT
+1162
+11
+1362
+161
+Plot Patients
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"red" 1.0 0 -2674135 true "" "plot count patients with [color = red]"
+"blue" 1.0 0 -13345367 true "" "plot count patients with [color = blue]"
+"green" 1.0 0 -10899396 true "" "plot count patients with [color = green]"
+"yellow" 1.0 0 -1184463 true "" "plot count patients with [color = yellow]"
+"gray" 1.0 0 -7500403 true "" "plot count patients with [color = gray]"
 
 @#$#@#$#@
 ## WHAT IS IT?
