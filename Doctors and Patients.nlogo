@@ -36,7 +36,7 @@ to go
   
   ; keep the count of patients if not divided exactly by 10
   set rest_of_patients ((patients-per-10-minutes + rest_of_patients) mod 10)
-   show rest_of_patients
+  ;show rest_of_patients
     
   create-patients (patients-per-10-minutes + rest_of_patients) / 10 [
     set size 2
@@ -129,7 +129,7 @@ BUTTON
 42
 74
 75
-NIL
+Go
 go
 NIL
 1
@@ -146,7 +146,7 @@ BUTTON
 75
 74
 108
-NIL
+Go
 go
 T
 1
