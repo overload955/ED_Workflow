@@ -3,51 +3,99 @@
 ;; RED, BLUE, GREEN, YELLOW, WHITE (or some shade of gray)
 breed [patients patient]
 breed [doctors doctor]
+breed [rooms room]
 
 ;; Patients properties
 patients-own [arrive-tick leave-tick]
+rooms-own [number-of-patients]
 
 globals [
-  ;;steps            ;; increment the tick counter only if step is exactly divided by tick-increment
-  ;;tick-increment   ;; if steps is divided by this value, increment the tick counter
   rest_of_patients ;; used if patients-per-10-minutes is not exactly divided by 10. 
 ]
 
 to setup
   clear-all
   reset-ticks
-  ;;set tick-increment 10
   
-  set-default-shape patients "person"
+  setup-patches
+  setup-doctors
+  setup-patients
+  setup-rooms
+  
+end
+
+to setup-patches
+  ask patches [set pcolor white]
+end
+
+to setup-doctors
   set-default-shape doctors "person doctor"
   
-  ask patches [
-    set pcolor white
-  ]
-  
   create-doctors number-of-doctors [
-    setxy 31 0
+    setxy 5 5
     set color black
     set size 2
   ]
+end
+
+to setup-patients
+  set-default-shape patients "person"
+end
+
+to setup-rooms
+  set-default-shape rooms "house efficiency"
+
+  create-rooms 1 [
+    setxy 10 30
+    set label "Room One"
+    set label-color black
+    set size 0
+  ]
   
+  create-rooms 1 [
+    setxy 30 30
+    set label "Room Two"
+    set label-color black
+    set size 0
+  ]
+  
+  create-rooms 1 [
+    setxy 50 30
+    set label "Room Three"
+    set label-color black
+    set size 0
+  ]
+  
+  create-rooms 1 [
+    setxy 10 15
+    set label "Room Four"
+    set label-color black
+    set size 0
+  ]
+  
+  create-rooms 1 [
+    setxy 30 15
+    set label "Laboratory"
+    set label-color black
+    set size 0
+  ]
 end
 
 ;; go 1 step
 to go
   ; keep the count of patients if not divided exactly by 10
   set rest_of_patients ((patients-per-10-minutes + rest_of_patients) mod 10)
-  ;show rest_of_patients
     
   create-patients (patients-per-10-minutes + rest_of_patients) / 10 [
     set size 2
     let seed (random-weighted [red blue green yellow gray] 
       (list red-percentage blue-percentage green-percentage yellow-percentage gray-percentage))
     set color seed
-    setxy -31 0
+    setxy 1 1
     ;set heading 90
     set arrive-tick ticks
   ]
+  
   evolve
   tick
 end
@@ -65,31 +113,35 @@ end
 
 to evolve
   ask patients [
-    forward 1
+    ;rt random 360
+    ;forward 1
     if (color = red) [
       ;; assume that after 100 ticks from arriving, red patients are externed
-      if (ticks - arrive-tick > 60 * 24 * 10) [ ;; 10 days
-        show who ;;" arrived at " arrive-tick " and died at " ticks
+      if (ticks - arrive-tick > 60 * 24 * 1) [
+        ;show who ;;" arrived at " arrive-tick " and died at " ticks
         die
       ]
     ]
     if (color = blue) [
       ;; assume that after 90 ticks from arriving, blue patients are externed
-      if (ticks - arrive-tick > 60 * 24 * 8) [die]
+      if (ticks - arrive-tick > 60 * 24 * 0.8) [die]
     ]
     if (color = green) [
       ;; assume that after 70 ticks from arriving, green patients are externed
-      if (ticks - arrive-tick > 60 * 24 * 6) [die]
+      if (ticks - arrive-tick > 60 * 24 * 0.6) [die]
     ]
     if (color = yellow) [
       ;; assume that after 50 ticks from arriving, yellow patients are externed
-      if (ticks - arrive-tick > 60 * 24 * 3) [die]
+      if (ticks - arrive-tick > 60 * 24 * 0.3) [die]
     ]
     if (color = gray) [
       ;; assume that after 30 ticks from arriving, gray patients are externed
-      if (ticks - arrive-tick > 60 * 24 * 1) [die]
+      if (ticks - arrive-tick > 60 * 24 * 0.1) [die]
     ]
+      ;print "hello world" 
   ]
+  
+  ;ask rooms with [label = "Room One"] [forward 1]
   
 end
 
@@ -107,15 +159,15 @@ to-report random-weighted [values weights]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-294
+440
 10
-1149
+1295
 470
-32
-16
+-1
+-1
 13.0
 1
-10
+20
 1
 1
 1
@@ -123,14 +175,14 @@ GRAPHICS-WINDOW
 0
 0
 1
--32
+0
+64
+0
 32
--16
-16
 0
 0
 1
-ticks
+minutes
 30.0
 
 BUTTON
@@ -193,7 +245,7 @@ red-percentage
 red-percentage
 0
 1
-0.1
+0.4
 .05
 1
 NIL
@@ -208,7 +260,7 @@ green-percentage
 green-percentage
 0
 1
-0.25
+0.1
 .05
 1
 NIL
@@ -223,7 +275,7 @@ blue-percentage
 blue-percentage
 0
 1
-0.25
+0.2
 0.05
 1
 NIL
@@ -238,7 +290,7 @@ yellow-percentage
 yellow-percentage
 0
 1
-0.3
+0.15
 0.05
 1
 NIL
@@ -253,17 +305,17 @@ gray-percentage
 gray-percentage
 0
 1
-0.1
+0.15
 0.05
 1
 NIL
 HORIZONTAL
 
 MONITOR
-82
-10
-167
-55
+217
+192
+302
+237
 Red Pacients
 count patients with [color = red]
 17
@@ -271,10 +323,10 @@ count patients with [color = red]
 11
 
 MONITOR
-83
-60
-168
-105
+218
+242
+303
+287
 Blue Patients
 count patients with [color = blue]
 17
@@ -282,10 +334,10 @@ count patients with [color = blue]
 11
 
 MONITOR
-177
-10
-272
-55
+312
+192
+407
+237
 Green Patients
 count patients with [color = green]
 17
@@ -293,10 +345,10 @@ count patients with [color = green]
 11
 
 MONITOR
-177
-60
-273
-105
+312
+242
+408
+287
 Yellow Patients
 count patients with [color = yellow]
 17
@@ -304,10 +356,10 @@ count patients with [color = yellow]
 11
 
 MONITOR
-85
-110
-173
-155
+219
+292
+307
+337
 Gray Patients
 count patients with [color = gray]
 17
@@ -323,7 +375,7 @@ patients-per-10-minutes
 patients-per-10-minutes
 0
 50
-10
+5
 1
 1
 NIL
@@ -394,10 +446,10 @@ NIL
 1
 
 MONITOR
-177
-110
-251
-155
+312
+292
+386
+337
 All Patients
 count patients
 17
@@ -405,10 +457,10 @@ count patients
 11
 
 PLOT
-1162
-11
-1362
-161
+92
+10
+428
+175
 Plot Patients
 NIL
 NIL
@@ -417,7 +469,7 @@ NIL
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
 "red" 1.0 0 -2674135 true "" "plot count patients with [color = red]"
@@ -612,6 +664,16 @@ Rectangle -7500403 true true 45 120 255 285
 Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
+
+house efficiency
+false
+0
+Rectangle -7500403 true true 180 90 195 195
+Rectangle -7500403 true true 90 165 210 255
+Rectangle -16777216 true false 165 195 195 255
+Rectangle -16777216 true false 105 202 135 240
+Polygon -7500403 true true 225 165 75 165 150 90
+Line -16777216 false 75 165 225 165
 
 leaf
 false
